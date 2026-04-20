@@ -1,11 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'app_state.dart';
 import 'landing_page.dart';
 import 'dashboard/dashboard_layout.dart';
 import 'dashboard/main_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase with the project's web config
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: "AIzaSyBRnFEpU1XNMh1DHh50zjePXJAs7Qr8aQo",
+      authDomain: "physical-event-exp-26.firebaseapp.com",
+      projectId: "physical-event-exp-26",
+      storageBucket: "physical-event-exp-26.firebasestorage.app",
+      messagingSenderId: "322900632341",
+      appId: "1:322900632341:web:3a6500cb7a529cebc33f1c",
+    ),
+  );
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => AppState(),
@@ -41,9 +56,47 @@ class MainGate extends StatelessWidget {
     final appState = Provider.of<AppState>(context);
 
     if (appState.isLoggedIn) {
-      return const DashboardLayout(child: MainDashboardView());
+      return DashboardLayout(
+        child: _buildCurrentView(appState.currentView),
+      );
     } else {
       return const LandingPage();
     }
+  }
+
+  Widget _buildCurrentView(DashboardView view) {
+    switch (view) {
+      case DashboardView.dashboard:
+        return const MainDashboardView();
+      case DashboardView.events:
+        return const EventsListView();
+      case DashboardView.analytics:
+        return const AnalyticsOverview();
+      case DashboardView.attendees:
+        return const Center(child: Text('Attendees Management Coming Soon'));
+      case DashboardView.settings:
+        return const Center(child: Text('System Settings Coming Soon'));
+    }
+  }
+}
+
+class EventsListView extends StatelessWidget {
+  const EventsListView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SingleChildScrollView(
+      padding: EdgeInsets.all(40),
+      child: EventsTableSection(),
+    );
+  }
+}
+
+class AnalyticsOverview extends StatelessWidget {
+  const AnalyticsOverview({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text('Advanced Analytics Console Rendering...'));
   }
 }

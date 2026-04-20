@@ -8,8 +8,6 @@ class MainDashboardView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-
     return SingleChildScrollView(
       padding: const EdgeInsets.all(40),
       child: Column(
@@ -32,25 +30,21 @@ class MainDashboardView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 40),
-          _buildQuickStats(),
+          Row(
+            children: [
+              _StatCard(title: 'Active Beacons', value: '142', color: Colors.greenAccent),
+              const SizedBox(width: 20),
+              _StatCard(title: 'Network Load', value: '12%', color: Colors.orangeAccent),
+              const SizedBox(width: 20),
+              _StatCard(title: 'Safety Status', value: 'Secure', color: Colors.blueAccent),
+            ],
+          ),
           const SizedBox(height: 40),
-          Text('Your Managed Events', style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)),
+          Text('Ongoing Projects', style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 20),
-          _EventsTable(events: appState.events),
+          const EventsTableSection(),
         ],
       ),
-    );
-  }
-
-  Widget _buildQuickStats() {
-    return Row(
-      children: [
-        _StatCard(title: 'Active Beacons', value: '142', color: Colors.greenAccent),
-        const SizedBox(width: 20),
-        _StatCard(title: 'Network Load', value: '12%', color: Colors.orangeAccent),
-        const SizedBox(width: 20),
-        _StatCard(title: 'Safety Status', value: 'Secure', color: Colors.blueAccent),
-      ],
     );
   }
 
@@ -63,20 +57,62 @@ class MainDashboardView extends StatelessWidget {
         title: const Text('New Event'),
         content: TextField(
           controller: nameController,
-          decoration: const InputDecoration(labelText: 'Event Name'),
+          decoration: const InputDecoration(labelText: 'Event Name', labelStyle: TextStyle(color: Colors.white38)),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
             onPressed: () {
-              Provider.of<AppState>(context, listen: false).addEvent(
-                EventModel(id: DateTime.now().toString(), name: nameController.text, date: '2026-08-01', status: 'Draft', attendees: 0),
-              );
+              if (nameController.text.isNotEmpty) {
+                Provider.of<AppState>(context, listen: false).addEvent(
+                  EventModel(id: DateTime.now().toString(), name: nameController.text, date: '2026-08-01', status: 'Draft', attendees: 0),
+                );
+              }
               Navigator.pop(context);
             },
             child: const Text('Create'),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class EventsTableSection extends StatelessWidget {
+  const EventsTableSection({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+    final events = appState.events;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.02),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+      ),
+      child: DataTable(
+        columns: const [
+          DataColumn(label: Text('Event Name', style: TextStyle(color: Colors.white38))),
+          DataColumn(label: Text('Date', style: TextStyle(color: Colors.white38))),
+          DataColumn(label: Text('Status', style: TextStyle(color: Colors.white38))),
+          DataColumn(label: Text('Attendees', style: TextStyle(color: Colors.white38))),
+          DataColumn(label: Text('Actions', style: TextStyle(color: Colors.white38))),
+        ],
+        rows: events.map((e) => DataRow(
+          cells: [
+            DataCell(Text(e.name, style: const TextStyle(fontWeight: FontWeight.bold))),
+            DataCell(Text(e.date)),
+            DataCell(_StatusBadge(status: e.status)),
+            DataCell(Text(e.attendees.toString())),
+            DataCell(IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+              onPressed: () => appState.removeEvent(e.id),
+            )),
+          ],
+        )).toList(),
       ),
     );
   }
@@ -93,54 +129,18 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(25),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.03),
+          color: Colors.white.withValues(alpha: 0.03),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white.withOpacity(0.05)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(color: Colors.white38, fontSize: 14)),
+            Text(title, style: const TextStyle(color: Colors.white38, fontSize: 13)),
             const SizedBox(height: 10),
-            Text(value, style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.bold, color: color)),
+            Text(value, style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: color)),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _EventsTable extends StatelessWidget {
-  final List<EventModel> events;
-  const _EventsTable({required this.events});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: DataTable(
-        columns: const [
-          DataColumn(label: Text('Event Name')),
-          DataColumn(label: Text('Date')),
-          DataColumn(label: Text('Status')),
-          DataColumn(label: Text('Attendees')),
-          DataColumn(label: Text('Actions')),
-        ],
-        rows: events.map((e) => DataRow(
-          cells: [
-            DataCell(Text(e.name, style: const TextStyle(fontWeight: FontWeight.bold))),
-            DataCell(Text(e.date)),
-            DataCell(_StatusBadge(status: e.status)),
-            DataCell(Text(e.attendees.toString())),
-            DataCell(IconButton(icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20), onPressed: () {
-              Provider.of<AppState>(context, listen: false).removeEvent(e.id);
-            })),
-          ],
-        )).toList(),
       ),
     );
   }
@@ -159,11 +159,11 @@ class _StatusBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
-      child: Text(status, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+      child: Text(status, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold)),
     );
   }
 }

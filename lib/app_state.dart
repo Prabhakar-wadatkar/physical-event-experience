@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+
+enum DashboardView { dashboard, events, analytics, attendees, settings }
 
 class EventModel {
   final String id;
@@ -17,8 +21,21 @@ class EventModel {
 }
 
 class AppState extends ChangeNotifier {
-  bool _isLoggedIn = false;
-  bool get isLoggedIn => _isLoggedIn;
+  User? _user;
+  User? get user => _user;
+  bool get isLoggedIn => _user != null;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  AppState() {
+    _auth.authStateChanges().listen((User? user) {
+      _user = user;
+      notifyListeners();
+    });
+  }
+
+  DashboardView _currentView = DashboardView.dashboard;
+  DashboardView get currentView => _currentView;
 
   final List<EventModel> _events = [
     EventModel(id: '1', name: 'Global Tech Summit', date: '2026-05-12', status: 'Active', attendees: 12400),
@@ -28,13 +45,35 @@ class AppState extends ChangeNotifier {
 
   List<EventModel> get events => _events;
 
-  void login() {
-    _isLoggedIn = true;
+  Future<void> signInWithGoogle() async {
+    try {
+      if (kIsWeb) {
+        // Use Firebase Popup for Web - standard and most stable approach
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        
+        // Add custom parameters if needed
+        googleProvider.setCustomParameters({
+          'login_hint': 'user@example.com'
+        });
+
+        await _auth.signInWithPopup(googleProvider);
+      } else {
+        // Mobile implementation would go here with google_sign_in package
+        debugPrint("Google Sign-In for Mobile currently not configured.");
+      }
+    } catch (e) {
+      debugPrint("Login Error: $e");
+    }
+  }
+
+  Future<void> logout() async {
+    await _auth.signOut();
+    _currentView = DashboardView.dashboard;
     notifyListeners();
   }
 
-  void logout() {
-    _isLoggedIn = false;
+  void setView(DashboardView view) {
+    _currentView = view;
     notifyListeners();
   }
 

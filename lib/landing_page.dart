@@ -23,8 +23,10 @@ class _LandingPageState extends State<LandingPage> {
   final GlobalKey _storiesKey = GlobalKey();
 
   void _scrollTo(GlobalKey key) {
-    Scrollable.ensureVisible(key.currentContext!,
-        duration: const Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
+    if (key.currentContext != null) {
+      Scrollable.ensureVisible(key.currentContext!,
+          duration: const Duration(milliseconds: 1000), curve: Curves.fastOutSlowIn);
+    }
   }
 
   @override
@@ -36,8 +38,8 @@ class _LandingPageState extends State<LandingPage> {
       body: Stack(
         children: [
           const ParticleBackground(),
-          Positioned(top: -200, right: -100, child: _GlowOrb(color: const Color(0xFF00E5FF).withOpacity(0.2), size: 600)),
-          Positioned(bottom: -200, left: -100, child: _GlowOrb(color: const Color(0xFFA100FF).withOpacity(0.15), size: 700)),
+          Positioned(top: -200, right: -100, child: _GlowOrb(color: const Color(0xFF00E5FF).withValues(alpha: 0.2), size: 600)),
+          Positioned(bottom: -200, left: -100, child: _GlowOrb(color: const Color(0xFFA100FF).withValues(alpha: 0.15), size: 700)),
 
           SingleChildScrollView(
             controller: _scrollController,
@@ -109,7 +111,7 @@ class Navbar extends StatelessWidget {
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(colors: [Color(0xFF00E5FF), Color(0xFF1DE9B6)]),
                       borderRadius: BorderRadius.circular(14),
-                      boxShadow: [BoxShadow(color: const Color(0xFF00E5FF).withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 5))],
+                      boxShadow: [BoxShadow(color: const Color(0xFF00E5FF).withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 5))],
                     ),
                     child: const Icon(Icons.hub, color: Colors.black, size: 28),
                   ),
@@ -128,16 +130,17 @@ class Navbar extends StatelessWidget {
                   _NavButton(title: 'Real-time Console', onTap: onDashboard),
                   _NavButton(title: 'Results', onTap: onStories),
                   const SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () => appState.login(),
+                  ElevatedButton.icon(
+                    onPressed: () => appState.signInWithGoogle(),
+                    icon: const Icon(Icons.account_circle_outlined, size: 20),
+                    label: const Text('Sign in with Google'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withOpacity(0.08),
+                      backgroundColor: Colors.white.withValues(alpha: 0.08),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-                      side: BorderSide(color: Colors.white.withOpacity(0.1)),
+                      side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                     ),
-                    child: const Text('Access Dashboard'),
                   ),
                 ],
               ),
@@ -147,9 +150,6 @@ class Navbar extends StatelessWidget {
     );
   }
 }
-
-// ... All other widgets (HeroSection, FeaturesSection, DashboardPreview, etc.) remain as they were in the previous turn ...
-// ... I will include them here but ensure they look at the AppState if needed ...
 
 class HeroSection extends StatelessWidget {
   final bool isMobile;
@@ -169,7 +169,7 @@ class HeroSection extends StatelessWidget {
           FadeIn(delay: const Duration(milliseconds: 500), child: SizedBox(width: 800, child: Text('The ultimate spatial engine for real-world attractions. Track millions of data points, engage thousands of users with AR, and automate venue logistics in one unified platform.', textAlign: TextAlign.center, style: GoogleFonts.inter(fontSize: 20, color: Colors.white60, height: 1.6)))),
           const SizedBox(height: 60),
           FadeInUp(delay: const Duration(milliseconds: 800), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _GlowButton(text: 'Deploy Space Engine', color: const Color(0xFF00E5FF), onTap: () => appState.login()),
+            _GlowButton(text: 'Deploy Space Engine', color: const Color(0xFF00E5FF), onTap: () => appState.signInWithGoogle()),
             const SizedBox(width: 25),
             _OutlineButton(text: 'Read Spec Sheet'),
           ])),
@@ -178,8 +178,6 @@ class HeroSection extends StatelessWidget {
     );
   }
 }
-
-// ... Including supporting widgets from previous main.dart ...
 
 class DashboardPreview extends StatelessWidget {
   final bool isMobile;
@@ -206,7 +204,7 @@ class DashboardPreview extends StatelessWidget {
               padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
-                gradient: LinearGradient(colors: [Colors.white.withOpacity(0.2), Colors.transparent, const Color(0xFF00E5FF).withOpacity(0.2)]),
+                gradient: LinearGradient(colors: [Colors.white.withValues(alpha: 0.2), Colors.transparent, const Color(0xFF00E5FF).withValues(alpha: 0.2)]),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(28),
@@ -214,7 +212,7 @@ class DashboardPreview extends StatelessWidget {
                   filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                   child: Container(
                     padding: const EdgeInsets.all(40),
-                    color: Colors.white.withOpacity(0.03),
+                    color: Colors.white.withValues(alpha: 0.03),
                     child: Column(
                       children: [
                         Row(
@@ -258,7 +256,7 @@ class DashboardPreview extends StatelessWidget {
           dotData: const FlDotData(show: false),
           belowBarData: BarAreaData(
             show: true,
-            gradient: LinearGradient(colors: [const Color(0xFF00E5FF).withOpacity(0.3), Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+            gradient: LinearGradient(colors: [const Color(0xFF00E5FF).withValues(alpha: 0.3), Colors.transparent], begin: Alignment.topCenter, end: Alignment.bottomCenter),
           ),
         ),
       ],
@@ -319,7 +317,7 @@ class NewsletterSection extends StatelessWidget {
       child: Center(
         child: Container(
           width: 900, padding: const EdgeInsets.all(60),
-          decoration: BoxDecoration(color: Colors.white.withOpacity(0.04), borderRadius: BorderRadius.circular(40), border: Border.all(color: Colors.white.withOpacity(0.05))),
+          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(40), border: Border.all(color: Colors.white.withValues(alpha: 0.05))),
           child: Column(children: [
             const Icon(Icons.mark_email_unread_outlined, size: 48, color: Color(0xFF00E5FF)),
             const SizedBox(height: 30),
@@ -339,13 +337,13 @@ class Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(80), color: Colors.black.withOpacity(0.5),
+      padding: const EdgeInsets.all(80), color: Colors.black.withValues(alpha: 0.5),
       child: Column(children: [
         Row(mainAxisAlignment: MainAxisAlignment.center, children: const [
           _SocialIcon(Icons.facebook), _SocialIcon(Icons.link), _SocialIcon(Icons.photo_camera),
         ]),
         const SizedBox(height: 50),
-        Text('© 2026 EVENTOS LABS.', style: TextStyle(color: Colors.white.withOpacity(0.2), letterSpacing: 2, fontSize: 12)),
+        Text('© 2026 EVENTOS LABS.', style: TextStyle(color: Colors.white.withValues(alpha: 0.2), letterSpacing: 2, fontSize: 12)),
       ]),
     );
   }
@@ -374,7 +372,7 @@ class _ParticlePainter extends CustomPainter {
   _ParticlePainter(this.particles);
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withOpacity(0.1);
+    final paint = Paint()..color = Colors.white.withValues(alpha: 0.1);
     for (var p in particles) { p.y -= p.speed; if (p.y < 0) p.y = 1.0; canvas.drawCircle(Offset(p.x * size.width, p.y * size.height), p.size, paint); }
   }
   @override
@@ -400,7 +398,7 @@ class _GlowButton extends StatelessWidget {
   const _GlowButton({required this.text, required this.color, required this.onTap});
   @override
   Widget build(BuildContext context) => Container(
-    decoration: BoxDecoration(boxShadow: [BoxShadow(color: color.withOpacity(0.4), blurRadius: 25, offset: const Offset(0, 10))]),
+    decoration: BoxDecoration(boxShadow: [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 25, offset: const Offset(0, 10))]),
     child: ElevatedButton(onPressed: onTap, style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 25), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: Text(text, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16))),
   );
 }
@@ -423,19 +421,19 @@ class _FeatureCardPro extends StatelessWidget {
   final IconData icon; final String title, desc; final Color color;
   const _FeatureCardPro({required this.icon, required this.title, required this.desc, required this.color});
   @override
-  Widget build(BuildContext context) => Container(width: 350, padding: const EdgeInsets.all(40), decoration: BoxDecoration(color: Colors.white.withOpacity(0.04), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white.withOpacity(0.05))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle), child: Icon(icon, color: color, size: 32)), const SizedBox(height: 30), Text(title, style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)), const SizedBox(height: 15), Text(desc, style: const TextStyle(color: Colors.white54, height: 1.5))]));
+  Widget build(BuildContext context) => Container(width: 350, padding: const EdgeInsets.all(40), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.04), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white.withValues(alpha: 0.05))), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: color.withValues(alpha: 0.1), shape: BoxShape.circle), child: Icon(icon, color: color, size: 32)), const SizedBox(height: 30), Text(title, style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)), const SizedBox(height: 15), Text(desc, style: const TextStyle(color: Colors.white54, height: 1.5))]));
 }
 
 class _StoryCard extends StatelessWidget {
   final String title, location, metric, tag;
   const _StoryCard({required this.title, required this.location, required this.metric, required this.tag});
   @override
-  Widget build(BuildContext context) => Container(padding: const EdgeInsets.all(30), decoration: BoxDecoration(color: Colors.white.withOpacity(0.03), borderRadius: BorderRadius.circular(25), border: Border.all(color: Colors.white.withOpacity(0.05))), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(tag, style: TextStyle(color: const Color(0xFF00E5FF).withOpacity(0.5), fontWeight: FontWeight.bold, fontSize: 10)), const SizedBox(height: 8), Text(title, style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)), const SizedBox(height: 4), Text(location, style: const TextStyle(color: Colors.white38))]), Text(metric, style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.w900, color: const Color(0xFF00E5FF)))]));
+  Widget build(BuildContext context) => Container(padding: const EdgeInsets.all(30), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.03), borderRadius: BorderRadius.circular(25), border: Border.all(color: Colors.white.withValues(alpha: 0.05))), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(tag, style: TextStyle(color: const Color(0xFF00E5FF).withValues(alpha: 0.5), fontWeight: FontWeight.bold, fontSize: 10)), const SizedBox(height: 8), Text(title, style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold)), const SizedBox(height: 4), Text(location, style: const TextStyle(color: Colors.white38))]), Text(metric, style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.w900, color: const Color(0xFF00E5FF)))]));
 }
 
 class _EmailInput extends StatelessWidget {
   @override
-  Widget build(BuildContext context) => Container(width: 500, padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.white.withOpacity(0.05), borderRadius: BorderRadius.circular(20)), child: Row(children: [const Expanded(child: Padding(padding: EdgeInsets.symmetric(horizontal: 20), child: TextField(decoration: InputDecoration(hintText: 'Work email', border: InputBorder.none)))), ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: const Text('Subscribe'))]));
+  Widget build(BuildContext context) => Container(width: 500, padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(20)), child: Row(children: [const Expanded(child: Padding(padding: EdgeInsets.symmetric(horizontal: 20), child: TextField(decoration: InputDecoration(hintText: 'Work email', border: InputBorder.none)))), ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: const Text('Subscribe'))]));
 }
 
 class _SocialIcon extends StatelessWidget {
@@ -459,12 +457,12 @@ class _LiveActivityTickerState extends State<LiveActivityTicker> {
   @override
   void dispose() { _timer?.cancel(); super.dispose(); }
   @override
-  Widget build(BuildContext context) => Container(width: double.infinity, color: const Color(0xFF00E5FF).withOpacity(0.05), padding: const EdgeInsets.symmetric(vertical: 12), child: Center(child: Text(_activities[_currentIndex], style: const TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 14))));
+  Widget build(BuildContext context) => Container(width: double.infinity, color: const Color(0xFF00E5FF).withValues(alpha: 0.05), padding: const EdgeInsets.symmetric(vertical: 12), child: Center(child: Text(_activities[_currentIndex], style: const TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold, fontSize: 14))));
 }
 
 class InquiryDialog extends StatelessWidget {
   const InquiryDialog({super.key});
   @override
   Widget build(BuildContext context) => BackdropFilter(filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10), child: Dialog(backgroundColor: const Color(0xFF151B2D), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)), child: Container(padding: const EdgeInsets.all(40), width: 500, child: Column(mainAxisSize: MainAxisSize.min, children: [Text('Contact Us', style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.bold)), const SizedBox(height: 32), _buildTextField('Name'), const SizedBox(height: 16), _buildTextField('Email'), const SizedBox(height: 32), SizedBox(width: double.infinity, child: ElevatedButton(onPressed: () => Navigator.pop(context), style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF00E5FF), foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(vertical: 20), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))), child: const Text('Submit', style: TextStyle(fontWeight: FontWeight.bold))))]))));
-  Widget _buildTextField(String label) => TextField(decoration: InputDecoration(labelText: label, filled: true, fillColor: Colors.white.withOpacity(0.05), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)));
+  Widget _buildTextField(String label) => TextField(decoration: InputDecoration(labelText: label, filled: true, fillColor: Colors.white.withValues(alpha: 0.05), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none)));
 }

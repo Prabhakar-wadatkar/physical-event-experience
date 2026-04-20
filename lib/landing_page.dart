@@ -101,26 +101,31 @@ class Navbar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           FadeInLeft(
-            child: InkWell(
-              onTap: onHome,
-              borderRadius: BorderRadius.circular(12),
-              child: Row(
-                children: [
-                   Container(
-                    width: 45, height: 45,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(colors: [Color(0xFF00E5FF), Color(0xFF1DE9B6)]),
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: [BoxShadow(color: const Color(0xFF00E5FF).withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 5))],
+            child: Semantics(
+              label: 'Eventos Brand Logo',
+              button: true,
+              child: InkWell(
+                onTap: onHome,
+                borderRadius: BorderRadius.circular(12),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 45, height: 45,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [Color(0xFF00E5FF), Color(0xFF1DE9B6)]),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [BoxShadow(color: const Color(0xFF00E5FF).withValues(alpha: 0.3), blurRadius: 15, offset: const Offset(0, 5))],
+                      ),
+                      child: const Icon(Icons.hub, color: Colors.black, size: 28),
                     ),
-                    child: const Icon(Icons.hub, color: Colors.black, size: 28),
-                  ),
-                  const SizedBox(width: 15),
-                  Text('EVENTOS', style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: 2)),
-                ],
+                    const SizedBox(width: 15),
+                    Text('EVENTOS', style: GoogleFonts.outfit(fontSize: 28, fontWeight: FontWeight.w900, letterSpacing: 2)),
+                  ],
+                ),
               ),
             ),
           ),
+
           if (!isSmall)
             FadeInRight(
               child: Row(
@@ -385,10 +390,15 @@ class _GlowButton extends StatelessWidget {
   final String text; final Color color; final VoidCallback onTap;
   const _GlowButton({required this.text, required this.color, required this.onTap});
   @override
-  Widget build(BuildContext context) => Container(
-    decoration: BoxDecoration(boxShadow: [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 25, offset: const Offset(0, 10))]),
-    child: ElevatedButton(onPressed: onTap, style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 25), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: Text(text, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16))),
+  Widget build(BuildContext context) => Semantics(
+    label: 'Launch Management Hub and Console',
+    button: true,
+    child: Container(
+      decoration: BoxDecoration(boxShadow: [BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 25, offset: const Offset(0, 10))]),
+      child: ElevatedButton(onPressed: onTap, style: ElevatedButton.styleFrom(backgroundColor: color, foregroundColor: Colors.black, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 25), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))), child: Text(text, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16))),
+    ),
   );
+
 }
 
 class _OutlineButton extends StatelessWidget {

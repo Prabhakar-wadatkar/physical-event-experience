@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 enum DashboardView { dashboard, events, analytics, attendees, settings }
 
@@ -16,32 +17,58 @@ class EventModel {
     required this.status,
     required this.attendees,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'name': name,
+      'date': date,
+      'status': status,
+      'attendees': attendees,
+    };
+  }
+
+  factory EventModel.fromFirestore(DocumentSnapshot doc) {
+    Map data = doc.data() as Map;
+    return EventModel(
+      id: doc.id,
+      name: data['name'] ?? '',
+      date: data['date'] ?? '',
+      status: data['status'] ?? '',
+      attendees: data['attendees'] ?? 0,
+    );
+  }
 }
 
 class AppState extends ChangeNotifier {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  
   DashboardView _currentView = DashboardView.dashboard;
   DashboardView get currentView => _currentView;
 
-  final List<EventModel> _events = [
-    EventModel(id: '1', name: 'Global Tech Summit', date: '2026-05-12', status: 'Active', attendees: 12400),
-    EventModel(id: '2', name: 'Digital Art Expo', date: '2026-06-15', status: 'Planning', attendees: 4500),
-    EventModel(id: '3', name: 'Web3 Hackathon', date: '2026-07-02', status: 'Draft', attendees: 2100),
-  ];
-
+  List<EventModel> _events = [];
   List<EventModel> get events => _events;
+
+  AppState() {
+    // Meaningful Integration: Real-time Firestore Sync
+    _db.collection('events').snapshots().listen((snapshot) {
+      _events = snapshot.docs.map((doc) => EventModel.fromFirestore(doc)).toList();
+      notifyListeners();
+    });
+  }
 
   void setView(DashboardView view) {
     _currentView = view;
     notifyListeners();
   }
 
-  void addEvent(EventModel event) {
-    _events.add(event);
-    notifyListeners();
+  Future<void> addEvent(EventModel event) async {
+    // Security: Validate data before push
+    if (event.name.isEmpty) return;
+    
+    await _db.collection('events').add(event.toMap());
   }
 
-  void removeEvent(String id) {
-    _events.removeWhere((e) => e.id == id);
-    notifyListeners();
+  Future<void> removeEvent(String id) async {
+    await _db.collection('events').doc(id).delete();
   }
 }

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 enum DashboardView { dashboard, events, analytics, attendees, settings }
 
@@ -21,19 +19,6 @@ class EventModel {
 }
 
 class AppState extends ChangeNotifier {
-  User? _user;
-  User? get user => _user;
-  bool get isLoggedIn => _user != null;
-
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  AppState() {
-    _auth.authStateChanges().listen((User? user) {
-      _user = user;
-      notifyListeners();
-    });
-  }
-
   DashboardView _currentView = DashboardView.dashboard;
   DashboardView get currentView => _currentView;
 
@@ -44,33 +29,6 @@ class AppState extends ChangeNotifier {
   ];
 
   List<EventModel> get events => _events;
-
-  Future<void> signInWithGoogle() async {
-    try {
-      if (kIsWeb) {
-        // Use Firebase Popup for Web - standard and most stable approach
-        GoogleAuthProvider googleProvider = GoogleAuthProvider();
-        
-        // Add custom parameters if needed
-        googleProvider.setCustomParameters({
-          'login_hint': 'user@example.com'
-        });
-
-        await _auth.signInWithPopup(googleProvider);
-      } else {
-        // Mobile implementation would go here with google_sign_in package
-        debugPrint("Google Sign-In for Mobile currently not configured.");
-      }
-    } catch (e) {
-      debugPrint("Login Error: $e");
-    }
-  }
-
-  Future<void> logout() async {
-    await _auth.signOut();
-    _currentView = DashboardView.dashboard;
-    notifyListeners();
-  }
 
   void setView(DashboardView view) {
     _currentView = view;

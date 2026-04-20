@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:provider/provider.dart';
 import 'dart:ui';
 import 'dart:async';
 import 'dart:math' as math;
-import 'app_state.dart';
+
 
 class LandingPage extends StatefulWidget {
-  const LandingPage({super.key});
+  final VoidCallback onEnterDashboard;
+  const LandingPage({super.key, required this.onEnterDashboard});
 
   @override
   State<LandingPage> createState() => _LandingPageState();
@@ -50,8 +50,9 @@ class _LandingPageState extends State<LandingPage> {
                   onFeatures: () => _scrollTo(_featuresKey),
                   onDashboard: () => _scrollTo(_dashboardKey),
                   onStories: () => _scrollTo(_storiesKey),
+                  onEnter: widget.onEnterDashboard,
                 ),
-                HeroSection(key: _homeKey, isMobile: isMobile),
+                HeroSection(key: _homeKey, isMobile: isMobile, onEnter: widget.onEnterDashboard),
                 const LiveActivityTicker(),
                 const FeaturesSection(),
                 DashboardPreview(key: _dashboardKey, isMobile: isMobile),
@@ -87,13 +88,12 @@ class _LandingPageState extends State<LandingPage> {
 }
 
 class Navbar extends StatelessWidget {
-  final VoidCallback onHome, onFeatures, onDashboard, onStories;
-  const Navbar({super.key, required this.onHome, required this.onFeatures, required this.onDashboard, required this.onStories});
+  final VoidCallback onHome, onFeatures, onDashboard, onStories, onEnter;
+  const Navbar({super.key, required this.onHome, required this.onFeatures, required this.onDashboard, required this.onStories, required this.onEnter});
 
   @override
   Widget build(BuildContext context) {
     bool isSmall = MediaQuery.of(context).size.width < 1000;
-    final appState = Provider.of<AppState>(context, listen: false);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 60, vertical: 30),
@@ -106,7 +106,7 @@ class Navbar extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: Row(
                 children: [
-                  Container(
+                   Container(
                     width: 45, height: 45,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(colors: [Color(0xFF00E5FF), Color(0xFF1DE9B6)]),
@@ -129,22 +129,10 @@ class Navbar extends StatelessWidget {
                   _NavButton(title: 'Solutions', onTap: onFeatures),
                   _NavButton(title: 'Real-time Console', onTap: onDashboard),
                   _NavButton(title: 'Results', onTap: onStories),
-                  const SizedBox(width: 20),
-                  ElevatedButton.icon(
-                    onPressed: () => appState.signInWithGoogle(),
-                    icon: const Icon(Icons.account_circle_outlined, size: 20),
-                    label: const Text('Sign in with Google'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white.withValues(alpha: 0.08),
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 20),
-                      side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                    ),
-                  ),
                 ],
               ),
             ),
+
         ],
       ),
     );
@@ -153,11 +141,11 @@ class Navbar extends StatelessWidget {
 
 class HeroSection extends StatelessWidget {
   final bool isMobile;
-  const HeroSection({super.key, required this.isMobile});
+  final VoidCallback onEnter;
+  const HeroSection({super.key, required this.isMobile, required this.onEnter});
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context, listen: false);
     return Container(
       padding: EdgeInsets.symmetric(horizontal: isMobile ? 30 : 80, vertical: isMobile ? 80 : 160),
       child: Column(
@@ -169,7 +157,7 @@ class HeroSection extends StatelessWidget {
           FadeIn(delay: const Duration(milliseconds: 500), child: SizedBox(width: 800, child: Text('The ultimate spatial engine for real-world attractions. Track millions of data points, engage thousands of users with AR, and automate venue logistics in one unified platform.', textAlign: TextAlign.center, style: GoogleFonts.inter(fontSize: 20, color: Colors.white60, height: 1.6)))),
           const SizedBox(height: 60),
           FadeInUp(delay: const Duration(milliseconds: 800), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            _GlowButton(text: 'Deploy Space Engine', color: const Color(0xFF00E5FF), onTap: () => appState.signInWithGoogle()),
+            _GlowButton(text: 'Launch Management Hub', color: const Color(0xFF00E5FF), onTap: onEnter),
             const SizedBox(width: 25),
             _OutlineButton(text: 'Read Spec Sheet'),
           ])),

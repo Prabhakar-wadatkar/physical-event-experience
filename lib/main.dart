@@ -9,17 +9,21 @@ import 'dashboard/main_view.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Firebase with the project's web config
-  await Firebase.initializeApp(
-    options: const FirebaseOptions(
-      apiKey: "AIzaSyBRnFEpU1XNMh1DHh50zjePXJAs7Qr8aQo",
-      authDomain: "physical-event-exp-26.firebaseapp.com",
-      projectId: "physical-event-exp-26",
-      storageBucket: "physical-event-exp-26.firebasestorage.app",
-      messagingSenderId: "322900632341",
-      appId: "1:322900632341:web:3a6500cb7a529cebc33f1c",
-    ),
-  );
+  try {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyBRnFEpU1XNMh1DHh50zjePXJAs7Qr8aQo",
+        authDomain: "physical-event-exp-26.firebaseapp.com",
+        projectId: "physical-event-exp-26",
+        storageBucket: "physical-event-exp-26.firebasestorage.app",
+        messagingSenderId: "322900632341",
+        appId: "1:322900632341:web:3a6500cb7a529cebc33f1c",
+      ),
+    );
+  } catch (e) {
+    debugPrint("Firebase Initialization Error: $e");
+    // Continue even if Firebase fails, as we are removing the login wall
+  }
 
   runApp(
     ChangeNotifierProvider(
@@ -48,19 +52,30 @@ class PhysicalEventApp extends StatelessWidget {
   }
 }
 
-class MainGate extends StatelessWidget {
+class MainGate extends StatefulWidget {
   const MainGate({super.key});
+
+  @override
+  State<MainGate> createState() => _MainGateState();
+}
+
+class _MainGateState extends State<MainGate> {
+  bool _showDashboard = false;
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
 
-    if (appState.isLoggedIn) {
+    if (_showDashboard) {
       return DashboardLayout(
         child: _buildCurrentView(appState.currentView),
       );
     } else {
-      return const LandingPage();
+      return LandingPage(onEnterDashboard: () {
+        setState(() {
+          _showDashboard = true;
+        });
+      });
     }
   }
 

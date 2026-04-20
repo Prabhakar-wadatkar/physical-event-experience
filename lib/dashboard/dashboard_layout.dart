@@ -83,9 +83,11 @@ class _Sidebar extends StatelessWidget {
           ),
           const Divider(color: Colors.white10, height: 40),
           ListTile(
-            onTap: () => appState.logout(),
-            leading: const Icon(Icons.logout, color: Colors.redAccent, size: 20),
-            title: const Text('Sign Out', style: TextStyle(color: Colors.redAccent, fontSize: 14)),
+            onTap: () {
+              // Exit logic or just stay
+            },
+            leading: const Icon(Icons.exit_to_app, color: Colors.white30, size: 20),
+            title: const Text('Exit System', style: TextStyle(color: Colors.white30, fontSize: 14)),
           ),
         ],
       ),
@@ -136,16 +138,13 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-    final user = appState.user;
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Good Day, ${user?.displayName?.split(" ").first ?? "Admin"}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+          const Text('System Command Center', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           Row(
             children: [
               IconButton(onPressed: () {}, icon: const Icon(Icons.notifications_none, color: Colors.white30, size: 20)),
@@ -156,13 +155,8 @@ class _Header extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(color: const Color(0xFF00E5FF).withValues(alpha: 0.3), width: 2),
-                  image: user?.photoURL != null 
-                    ? DecorationImage(image: NetworkImage(user!.photoURL!), fit: BoxFit.cover)
-                    : null,
                 ),
-                child: user?.photoURL == null 
-                  ? Center(child: Text(user?.displayName?[0] ?? 'A', style: const TextStyle(color: Color(0xFF00E5FF), fontWeight: FontWeight.bold)))
-                  : null,
+                child: const Center(child: Icon(Icons.admin_panel_settings, color: Color(0xFF00E5FF), size: 20)),
               ),
             ],
           ),

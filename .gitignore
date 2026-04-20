@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase
+.firebase/
+firebase-debug.log*
+.firebaserc # Optional: remove if you want to share project ID
+
+# System
+Thumbs.db
+desktop.ini
+
